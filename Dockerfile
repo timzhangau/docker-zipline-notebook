@@ -12,7 +12,7 @@ ENV PROJECT_DIR=/projects \
     NOTEBOOK_PORT=8888 \
     SSL_CERT_PEM=/root/.jupyter/jupyter.pem \
     SSL_CERT_KEY=/root/.jupyter/jupyter.key \
-    PW_HASH="u'sha1:31cb67870a35:1a2321318481f00b0efdf3d1f71af523d3ffc505'" \
+    # PW_HASH="u'sha1:31cb67870a35:1a2321318481f00b0efdf3d1f71af523d3ffc505'" \
     CONFIG_PATH=/root/.jupyter/jupyter_notebook_config.py \
     ZIPLINE_ROOT=/zipline
 
@@ -33,17 +33,17 @@ RUN mkdir ${PROJECT_DIR} \
 WORKDIR /ta-lib
 
 RUN pip install 'numpy>=1.11.1,<2.0.0' \
-  && pip install 'scipy>=1.1.0,<1.10.0' \
-  && pip install 'pandas>=0.18.1,<1.0.0' \
-  && ./configure --prefix=/usr \
-  && make \
-  && make install \
-  && pip install TA-Lib \
-  && pip install matplotlib \
-  && pip install jupyter
+    && pip install 'scipy>=1.1.0,<1.10.0' \
+    && pip install 'pandas>=0.18.1,<1.0.0' \
+    && ./configure --prefix=/usr \
+    && make \
+    && make install \
+    && pip install TA-Lib \
+    && pip install matplotlib \
+    && pip install jupyter
 
 RUN pip install zipline \
-  && pip install pyfolio
+    && pip install pyfolio
 
 # ingest zipline data
 RUN zipline ingest -b quantopian-quandl
@@ -57,7 +57,7 @@ COPY ./zipline/loader.py /usr/local/lib/python3.5/site-packages/zipline/data/loa
 # image after build and install.
 #
 
-ENV PW_HASH='123'
+# ENV PW_HASH='123'
 ADD ./docker-cmd.sh /
 RUN chmod +x /docker-cmd.sh
 
