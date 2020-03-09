@@ -48,11 +48,16 @@ RUN pip install zipline \
 # ingest zipline data
 RUN zipline ingest -b quantopian-quandl
 
+# hack to fix zipline benchmark error
+COPY ./zipline/benchmarks.py /usr/local/lib/python3.5/site-packages/zipline/data/benchmarks.py
+COPY ./zipline/loader.py /usr/local/lib/python3.5/site-packages/zipline/data/loader.py
+
 #
 # This is then only file we need from source to remain in the
 # image after build and install.
 #
 
+ENV PW_HASH='123'
 ADD ./docker-cmd.sh /
 RUN chmod +x /docker-cmd.sh
 
