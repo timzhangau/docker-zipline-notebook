@@ -19,17 +19,14 @@ ENV PROJECT_DIR=/projects \
 #
 # install TA-Lib and other prerequisites
 #
-
 RUN mkdir ${PROJECT_DIR} \
     && apt-get -y update \
     && apt-get -y install libfreetype6-dev libpng-dev libopenblas-dev liblapack-dev gfortran libhdf5-dev \
     && curl -L https://downloads.sourceforge.net/project/ta-lib/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz | tar xvz
 
 #
-# build and install zipline from source.  install TA-Lib after to ensure
-# numpy is available.
+# install TA-Lib after to ensure numpy is available.
 #
-
 WORKDIR /ta-lib
 
 RUN pip install 'numpy>=1.11.1,<2.0.0' \
@@ -42,42 +39,32 @@ RUN pip install 'numpy>=1.11.1,<2.0.0' \
     && pip install matplotlib \
     && pip install jupyter
 
+
+# install zipline and pyfolio
 RUN pip install zipline \
     && pip install pyfolio
 
-# ingest zipline data
+# ingest zipline quandl data
 RUN zipline ingest -b quantopian-quandl
 
-# hack to fix zipline benchmark error
+# hack to fix zipline missing benchmark data error
 COPY ./zipline/benchmarks.py /usr/local/lib/python3.5/site-packages/zipline/data/benchmarks.py
 COPY ./zipline/loader.py /usr/local/lib/python3.5/site-packages/zipline/data/loader.py
 
 #
-# This is then only file we need from source to remain in the
-# image after build and install.
+# docker start up cmd
 #
-
-# ENV PW_HASH='123'
 ADD ./docker-cmd.sh /
 RUN chmod +x /docker-cmd.sh
 
 #
-# make port available. /zipline is made a volume
-# for developer testing.
+# make port available
 #
 EXPOSE ${NOTEBOOK_PORT}
 
-#
-# build and install the zipline package into the image
-#
-
-# ADD . /zipline
-# WORKDIR /zipline
-# RUN pip install -e .
 
 #
 # start the jupyter server
 #
-
 WORKDIR ${PROJECT_DIR}
 CMD /docker-cmd.sh
